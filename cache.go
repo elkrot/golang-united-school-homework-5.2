@@ -22,6 +22,7 @@ func (c *Cache) Get(key string) (string, bool) {
 	}
 
 	if !value.deadline.IsZero() && value.deadline.Before(time.Now()) {
+		delete(c.Values, key)
 		return "", false
 	}
 	return value.value, true
@@ -35,7 +36,7 @@ func (c *Cache) Put(key, value string) {
 func (c *Cache) Keys() []string {
 	keys := []string{}
 	for k, v := range c.Values {
-		if !v.deadline.IsZero() && v.deadline.Before(time.Now()) {
+		if v.deadline.IsZero() || v.deadline.Before(time.Now()) {
 			keys = append(keys, k)
 		}
 	}
